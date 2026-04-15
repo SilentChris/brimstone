@@ -1,0 +1,13 @@
+{
+  "name": "brimstone-missions",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "export": "node export.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.14",
+    "hono": "^4.12.12"
+  }
+}

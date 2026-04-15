@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shadows of Brimstone — Mission Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Shadows of Brimstone</h1>
+    <p class="subtitle">Mission Tracker</p>
+  </header>
+
+  <nav>
+    <button class="tab active" data-tab="missions">Missions</button>
+    <button class="tab" data-tab="randomizer">Randomizer</button>
+    <button class="tab" data-tab="sourcebooks">Sourcebooks</button>
+    <button class="tab" data-tab="history">History</button>
+  </nav>
+
+  <!-- MISSIONS TAB -->
+  <section id="missions" class="tab-content active">
+    <h2>Mission List</h2>
+    <form id="add-mission-form" class="mission-form">
+      <div class="form-row">
+        <input type="number" id="mission-number" placeholder="#" min="1" class="num-input">
+        <input type="text" id="mission-title" placeholder="Mission title" required>
+        <select id="mission-sourcebook" required>
+          <option value="">Sourcebook…</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <span class="form-label">Tags:</span>
+        <div id="mission-tags" class="checkbox-group"></div>
+      </div>
+      <div class="form-row">
+        <span class="form-label">Enemies:</span>
+        <div class="enemy-input-wrap">
+          <input type="text" id="enemy-search" placeholder="Search or add enemy type…" autocomplete="off">
+          <div id="enemy-suggestions" class="suggestions hidden"></div>
+          <div id="enemy-selected" class="tag-list"></div>
+        </div>
+      </div>
+      <button type="submit">Add Mission</button>
+    </form>
+    <div id="mission-list"></div>
+  </section>
+
+  <!-- RANDOMIZER TAB -->
+  <section id="randomizer" class="tab-content">
+    <h2>Random Mission</h2>
+    <div class="filter-group">
+      <h3>Filter by sourcebook</h3>
+      <div id="randomizer-sourcebooks" class="checkbox-group"></div>
+    </div>
+    <div class="filter-group">
+      <h3>Filter by tags <span class="filter-hint">(click to cycle: ignore / require / exclude)</span></h3>
+      <div id="randomizer-tags" class="tag-filter-group"></div>
+    </div>
+    <button id="pick-random" class="big-btn">Pick a Random Mission</button>
+    <div id="random-result" class="result-card hidden"></div>
+  </section>
+
+  <!-- SOURCEBOOKS TAB -->
+  <section id="sourcebooks" class="tab-content">
+    <h2>Sourcebooks</h2>
+    <form id="add-sourcebook-form" class="inline-form">
+      <input type="text" id="sourcebook-name" placeholder="Sourcebook name" required>
+      <button type="submit">Add</button>
+    </form>
+    <div id="sourcebook-list"></div>
+
+    <h2 style="margin-top:1.5rem">Enemy Types</h2>
+    <div id="enemy-type-list"></div>
+
+    <h2 style="margin-top:1.5rem">Tags</h2>
+    <form id="add-tag-form" class="inline-form">
+      <input type="text" id="tag-name" placeholder="New tag name" required>
+      <button type="submit">Add</button>
+    </form>
+    <div id="tag-list"></div>
+  </section>
+
+  <!-- HISTORY TAB -->
+  <section id="history" class="tab-content">
+    <h2>Completed Missions</h2>
+    <div id="history-list"></div>
+  </section>
+
+  <!-- EDIT MODAL -->
+  <div id="edit-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>Edit Mission</h2>
+      <form id="edit-mission-form" class="mission-form">
+        <input type="hidden" id="edit-mission-id">
+        <div class="form-row">
+          <input type="number" id="edit-mission-number" placeholder="#" min="1" class="num-input">
+          <input type="text" id="edit-mission-title" placeholder="Mission title" required>
+          <select id="edit-mission-sourcebook" required>
+            <option value="">Sourcebook…</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <span class="form-label">Tags:</span>
+          <div id="edit-mission-tags" class="checkbox-group"></div>
+        </div>
+        <div class="form-row">
+          <span class="form-label">Enemies:</span>
+          <div class="enemy-input-wrap">
+            <input type="text" id="edit-enemy-search" placeholder="Search or add enemy type…" autocomplete="off">
+            <div id="edit-enemy-suggestions" class="suggestions hidden"></div>
+            <div id="edit-enemy-selected" class="tag-list"></div>
+          </div>
+        </div>
+        <div class="form-row" style="gap:0.5rem">
+          <button type="submit">Save</button>
+          <button type="button" id="edit-cancel" class="btn-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

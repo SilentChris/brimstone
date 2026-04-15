@@ -1,0 +1,187 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+header { text-align: center; padding: 1.5rem 0 0.5rem; }
+header h1 { color: #c9a227; font-size: 1.6rem; }
+.subtitle { color: #888; font-size: 0.9rem; }
+
+/* Tabs */
+nav { display: flex; gap: 0.25rem; margin: 1rem 0; border-bottom: 2px solid #333; }
+.tab {
+  background: none; border: none; color: #888; padding: 0.6rem 1rem;
+  cursor: pointer; font-size: 0.9rem; border-bottom: 2px solid transparent;
+  margin-bottom: -2px; transition: color 0.2s;
+}
+.tab:hover { color: #ccc; }
+.tab.active { color: #c9a227; border-bottom-color: #c9a227; }
+
+.tab-content { display: none; padding: 1rem 0; }
+.tab-content.active { display: block; }
+
+h2 { color: #c9a227; margin-bottom: 1rem; font-size: 1.2rem; }
+h3 { color: #aaa; font-size: 0.9rem; margin-bottom: 0.5rem; }
+
+/* Forms */
+.inline-form {
+  display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;
+}
+.inline-form input, .inline-form select {
+  flex: 1; min-width: 140px; padding: 0.5rem 0.75rem;
+  background: #16213e; border: 1px solid #333; border-radius: 4px;
+  color: #e0e0e0; font-size: 0.9rem;
+}
+.inline-form button, .mission-form button[type="submit"], button.big-btn {
+  padding: 0.5rem 1rem; background: #c9a227; color: #1a1a2e;
+  border: none; border-radius: 4px; cursor: pointer; font-weight: 600;
+  font-size: 0.9rem;
+}
+.inline-form button:hover, .mission-form button[type="submit"]:hover, button.big-btn:hover { background: #ddb832; }
+
+button.big-btn { width: 100%; padding: 0.75rem; font-size: 1rem; margin: 1rem 0; }
+
+/* Mission form */
+.mission-form {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  margin-bottom: 1rem; padding: 0.75rem; background: #0f1a30; border-radius: 6px;
+}
+.form-row {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+}
+.form-row input, .form-row select {
+  padding: 0.5rem 0.75rem; background: #16213e; border: 1px solid #333;
+  border-radius: 4px; color: #e0e0e0; font-size: 0.9rem;
+}
+.form-row input { flex: 1; min-width: 120px; }
+.form-row select { flex: 1; min-width: 140px; }
+.num-input { max-width: 55px !important; min-width: 55px !important; flex: 0 !important; text-align: center; }
+.form-label { color: #888; font-size: 0.85rem; white-space: nowrap; min-width: 60px; }
+
+/* Enemy type input */
+.enemy-input-wrap { flex: 1; position: relative; min-width: 200px; }
+.enemy-input-wrap input { width: 100%; }
+.suggestions {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 10;
+  background: #16213e; border: 1px solid #444; border-radius: 0 0 4px 4px;
+  max-height: 150px; overflow-y: auto;
+}
+.suggestions .suggestion {
+  padding: 0.4rem 0.75rem; cursor: pointer; font-size: 0.85rem;
+}
+.suggestions .suggestion:hover, .suggestions .suggestion.active { background: #1e2f50; }
+.suggestions .suggestion.add-new { color: #c9a227; font-style: italic; }
+
+/* Tag pills */
+.tag-list { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.3rem; }
+.tag-pill {
+  font-size: 0.7rem; background: #333; color: #ccc; padding: 0.15rem 0.5rem;
+  border-radius: 3px; display: flex; align-items: center; gap: 0.25rem;
+}
+.tag-pill .remove-tag { cursor: pointer; color: #e74c3c; font-weight: bold; }
+.tag-pill.preset-map { background: #2c3e50; color: #3498db; }
+.tag-pill.no-gates { background: #2c2c1a; color: #e67e22; }
+.tag-pill.starts-other-world { background: #1a2c1a; color: #2ecc71; }
+.tag-pill.epic-threat { background: #2c1a1a; color: #e74c3c; }
+.tag-pill.enemy { background: #1a1a2c; color: #9b59b6; }
+
+/* Mission number display */
+.mission-num {
+  font-size: 0.75rem; color: #888; background: #222; padding: 0.1rem 0.4rem;
+  border-radius: 3px; font-weight: 600; white-space: nowrap;
+}
+
+/* Lists */
+.item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 0.75rem; background: #16213e; border-radius: 4px;
+  margin-bottom: 0.4rem;
+}
+.item .title { flex: 1; }
+.item .source-tag {
+  font-size: 0.75rem; background: #333; color: #aaa;
+  padding: 0.15rem 0.5rem; border-radius: 3px; white-space: nowrap;
+}
+.item button {
+  background: none; border: none; cursor: pointer; font-size: 0.85rem;
+  padding: 0.25rem 0.5rem; border-radius: 3px;
+}
+.item .btn-delete { color: #e74c3c; }
+.item .btn-delete:hover { background: rgba(231,76,60,0.15); }
+.item .btn-success { color: #2ecc71; }
+.item .btn-success:hover { background: rgba(46,204,113,0.15); }
+.item .btn-fail { color: #e67e22; }
+.item .btn-fail:hover { background: rgba(230,126,34,0.15); }
+.item .btn-undo { color: #3498db; }
+.item .btn-undo:hover { background: rgba(52,152,219,0.15); }
+
+.item.completed { opacity: 0.6; }
+.result-badge {
+  font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.4rem;
+  border-radius: 3px; text-transform: uppercase;
+}
+.result-badge.success { background: #2ecc71; color: #1a1a2e; }
+.result-badge.failure { background: #e67e22; color: #1a1a2e; }
+
+/* Randomizer */
+.filter-group { margin-bottom: 0.75rem; }
+.filter-hint { font-size: 0.75rem; color: #666; font-weight: normal; }
+
+/* Three-state tag filter */
+.tag-filter-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tag-filter {
+  padding: 0.35rem 0.65rem; border-radius: 4px; font-size: 0.85rem;
+  cursor: pointer; user-select: none; border: 1px solid #333;
+  background: #16213e; color: #888; transition: all 0.15s;
+}
+.tag-filter[data-state="include"] {
+  background: rgba(46,204,113,0.15); color: #2ecc71; border-color: #2ecc71;
+}
+.tag-filter[data-state="exclude"] {
+  background: rgba(231,76,60,0.15); color: #e74c3c; border-color: #e74c3c;
+  text-decoration: line-through;
+}
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.checkbox-group label {
+  display: flex; align-items: center; gap: 0.3rem;
+  background: #16213e; padding: 0.35rem 0.65rem; border-radius: 4px;
+  font-size: 0.85rem; cursor: pointer;
+}
+.checkbox-group input[type="checkbox"] { accent-color: #c9a227; }
+
+.result-card {
+  background: #16213e; border: 2px solid #c9a227; border-radius: 6px;
+  padding: 1.25rem; text-align: center;
+}
+.result-card .mission-name { font-size: 1.3rem; color: #fff; margin-bottom: 0.3rem; }
+.result-card .mission-source { color: #888; font-size: 0.9rem; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+.modal {
+  background: #1a1a2e; border: 1px solid #333; border-radius: 8px;
+  padding: 1.25rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;
+}
+.modal h2 { margin-bottom: 0.75rem; }
+.btn-cancel {
+  padding: 0.5rem 1rem; background: #444; color: #ccc;
+  border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;
+}
+.btn-cancel:hover { background: #555; }
+
+.hidden { display: none; }
+
+.empty-state { color: #666; font-style: italic; padding: 1rem 0; }
+
+/* Edit button in mission items */
+.item .btn-edit { color: #3498db; }
+.item .btn-edit:hover { background: rgba(52,152,219,0.15); }
