@@ -50,16 +50,16 @@
   <!-- RANDOMIZER TAB -->
   <section id="randomizer" class="tab-content">
     <h2>Random Mission</h2>
-    <div class="filter-group">
-      <h3>Filter by sourcebook</h3>
-      <div id="randomizer-sourcebooks" class="checkbox-group"></div>
-    </div>
+    <button id="pick-random" class="big-btn">Pick a Random Mission</button>
+    <div id="random-result" class="result-card hidden"></div>
     <div class="filter-group">
       <h3>Filter by tags <span class="filter-hint">(click to cycle: ignore / require / exclude)</span></h3>
       <div id="randomizer-tags" class="tag-filter-group"></div>
     </div>
-    <button id="pick-random" class="big-btn">Pick a Random Mission</button>
-    <div id="random-result" class="result-card hidden"></div>
+    <div class="filter-group">
+      <h3>Filter by sourcebook <span id="randomizer-sourcebook-toggles"></span></h3>
+      <div id="randomizer-sourcebooks" class="sourcebook-filter-list"></div>
+    </div>
   </section>
 
   <!-- SOURCEBOOKS TAB -->

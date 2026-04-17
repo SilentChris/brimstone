@@ -322,6 +322,8 @@ function renderSourcebookDropdown(selectId, selectedId) {
 }
 
 function renderRandomizerSourcebooks() {
+  document.getElementById("randomizer-sourcebook-toggles").innerHTML =
+    `<span class="select-toggle" onclick="toggleRandomizerSourcebooks(true)">all</span> / <span class="select-toggle" onclick="toggleRandomizerSourcebooks(false)">none</span>`;
   const el = document.getElementById("randomizer-sourcebooks");
   el.innerHTML = sourcebooks
     .map(
@@ -330,6 +332,12 @@ function renderRandomizerSourcebooks() {
     )
     .join("");
 }
+
+window.toggleRandomizerSourcebooks = function (checked) {
+  document.querySelectorAll('#randomizer-sourcebooks input[type="checkbox"]').forEach(
+    (cb) => (cb.checked = checked)
+  );
+};
 
 document.getElementById("add-sourcebook-form").addEventListener("submit", async (e) => {
   e.preventDefault();

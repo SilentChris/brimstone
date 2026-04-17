@@ -40,11 +40,6 @@ db.exec(`
   );
 `);
 
-// Seed default tags (safe to run on existing DB — INSERT OR IGNORE)
-const DEFAULT_TAGS = ["Preset Map", "No Gates", "Starts In Other World", "Epic Threat"];
-const seedTag = db.prepare("INSERT OR IGNORE INTO tags (name) VALUES (?)");
-for (const t of DEFAULT_TAGS) seedTag.run(t);
-
 // --- Migration: text-based mission_tags → id-based ---
 // If mission_tags has a 'tag' TEXT column (old schema), migrate to tag_id references.
 const mtCols = db.prepare("PRAGMA table_info(mission_tags)").all();
