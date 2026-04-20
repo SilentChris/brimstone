@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -b session=868e6421704e133c06bb0156dc1ccb2fa842b374963e8df7390a7a696965202e -X POST http://localhost:3003/api/campaigns/1/completions -H 'Content-Type: application/json' -d '{\"mission_id\":1,\"result\":\"success\"}')",
+      "Bash(curl -s -b session=868e6421704e133c06bb0156dc1ccb2fa842b374963e8df7390a7a696965202e 'http://localhost:3003/api/missions?campaign_id=1')"
+    ]
+  }
+}
