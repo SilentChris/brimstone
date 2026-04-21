@@ -75,7 +75,7 @@ header h1 { color: #c9a227; font-size: 1.6rem; }
 #username-display { color: #c9a227; font-size: 0.8rem; font-weight: 600; }
 
 /* Tabs */
-nav { display: flex; gap: 0.25rem; margin: 1rem 0; border-bottom: 2px solid #333; overflow-x: auto; }
+nav { display: flex; gap: 0.25rem; margin: 1rem 0; border-bottom: 2px solid #333; overflow-x: auto; overflow-y: hidden; }
 .tab {
   background: none; border: none; color: #888; padding: 0.6rem 1rem;
   cursor: pointer; font-size: 0.9rem; border-bottom: 2px solid transparent;
