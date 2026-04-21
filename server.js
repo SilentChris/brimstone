@@ -4,7 +4,7 @@ const { serve } = require("@hono/node-server");
 const { DatabaseSync } = require("node:sqlite");
 const crypto = require("node:crypto");
 
-const db = new DatabaseSync("./brimstone.db");
+const db = new DatabaseSync(process.env.DB_PATH || "./brimstone.db");
 
 // --- Schema ---
 db.exec(`
