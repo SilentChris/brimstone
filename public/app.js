@@ -10,6 +10,7 @@ let allTags = [];
 let allEnemyTypes = [];
 let selectedEnemies = [];
 let editSelectedEnemies = [];
+let editMode = false;
 
 // --- API helpers ---
 async function api(method, path, body) {
@@ -112,6 +113,15 @@ document.getElementById("change-pw-btn").addEventListener("click", async () => {
 document.getElementById("logout-btn").addEventListener("click", async () => {
   await fetch(API + "/api/auth/logout", { method: "POST" });
   showLogin();
+});
+
+// --- Edit mode toggle ---
+document.getElementById("edit-mode-btn").addEventListener("click", () => {
+  editMode = !editMode;
+  const btn = document.getElementById("edit-mode-btn");
+  btn.classList.toggle("active", editMode);
+  btn.textContent = editMode ? "Done" : "Edit";
+  renderMissions();
 });
 
 // --- Tabs ---
@@ -566,12 +576,12 @@ function renderMissions() {
           ${missionLabel(m)}
           <div class="tag-list">${renderTagPills(m.tags, m.enemy_types)}</div>
         </div>
-        ${isAdmin ? `<button class="btn-edit" onclick="openEditModal(${m.id})" title="Edit">edit</button>` : ""}
+        ${isAdmin && editMode ? `<button class="btn-edit" onclick="openEditModal(${m.id})" title="Edit">edit</button>` : ""}
         ${activeCampaignId ? `
           <button class="btn-success" onclick="completeMission(${m.id}, 'success')" title="Mark success">pass</button>
           <button class="btn-fail" onclick="completeMission(${m.id}, 'failure')" title="Mark failure">fail</button>
         ` : ""}
-        ${isAdmin ? `<button class="btn-delete" onclick="deleteMission(${m.id})">remove</button>` : ""}
+        ${isAdmin && editMode ? `<button class="btn-delete" onclick="deleteMission(${m.id})">remove</button>` : ""}
       </div>`
       )
       .join("")}`
@@ -781,7 +791,21 @@ document.getElementById("pick-random").addEventListener("click", async () => {
     el.innerHTML = `
       <div class="mission-name">${esc(result.title)}</div>
       <div class="mission-source">${esc(result.sourcebook)}${result.mission_number ? ` — Mission #${result.mission_number}` : ""}</div>
-      ${result.tags.length || result.enemy_types.length ? `<div class="tag-list" style="justify-content:center;margin-top:0.5rem">${renderTagPills(result.tags, result.enemy_types)}</div>` : ""}`;
+      ${result.tags.length || result.enemy_types.length ? `<div class="tag-list" style="justify-content:center;margin-top:0.5rem">${renderTagPills(result.tags, result.enemy_types)}</div>` : ""}
+      ${activeCampaignId ? `<div class="result-actions">
+        <button class="btn-success" data-id="${result.id}">Pass</button>
+        <button class="btn-fail" data-id="${result.id}">Fail</button>
+      </div>` : ""}`;
+    if (activeCampaignId) {
+      el.querySelector(".btn-success").addEventListener("click", async () => {
+        await completeMission(result.id, "success");
+        el.classList.add("hidden");
+      });
+      el.querySelector(".btn-fail").addEventListener("click", async () => {
+        await completeMission(result.id, "failure");
+        el.classList.add("hidden");
+      });
+    }
   }
 });
 
