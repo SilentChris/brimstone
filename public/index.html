@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Shadows of Brimstone — Mission Tracker</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- LOGIN OVERLAY -->
-  <div id="login-overlay" class="login-overlay">
+  <div id="login-overlay" class="login-overlay hidden">
     <div class="login-box">
       <h1>Shadows of Brimstone</h1>
       <p class="subtitle">Mission Tracker</p>
@@ -33,13 +33,22 @@
   </div>
 
   <!-- APP (hidden until logged in) -->
+  <!-- User panel -->
+  <div id="user-panel-backdrop" class="user-panel-backdrop hidden"></div>
+  <div id="user-panel" class="user-panel hidden">
+    <div class="user-panel-name" id="username-display"></div>
+    <button id="change-pw-btn" class="btn-small">Change Password</button>
+    <button id="logout-btn" class="btn-small btn-danger-small">Log out</button>
+  </div>
+
   <div id="app" class="hidden">
     <header>
       <h1>Shadows of Brimstone</h1>
       <p class="subtitle">Mission Tracker</p>
+      <button id="user-panel-btn" class="user-panel-btn" aria-label="User menu">&#9679;</button>
     </header>
 
-    <!-- User / Campaign bar -->
+    <!-- Campaign bar -->
     <div id="user-bar">
       <div class="campaign-controls">
         <label for="campaign-select">Campaign:</label>
@@ -47,11 +56,6 @@
         <button id="new-campaign-btn" class="btn-small">+ New</button>
         <button id="rename-campaign-btn" class="btn-small">Rename</button>
         <button id="delete-campaign-btn" class="btn-small btn-danger-small">Delete</button>
-      </div>
-      <div class="user-controls">
-        <span id="username-display"></span>
-        <button id="change-pw-btn" class="btn-small">Password</button>
-        <button id="logout-btn" class="btn-small">Log out</button>
       </div>
     </div>
 

@@ -5,6 +5,7 @@ const { DatabaseSync } = require("node:sqlite");
 const crypto = require("node:crypto");
 
 const db = new DatabaseSync(process.env.DB_PATH || "./brimstone.db");
+const COOKIE_FLAGS = `Path=/; HttpOnly; SameSite=Strict${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
 
 // --- Schema ---
 db.exec(`
@@ -144,7 +145,7 @@ app.post("/api/auth/register", async (c) => {
       .run(username.trim(), hashPassword(password));
     const token = crypto.randomBytes(32).toString("hex");
     db.prepare("INSERT INTO sessions (id, user_id) VALUES (?, ?)").run(token, Number(info.lastInsertRowid));
-    c.header("Set-Cookie", `session=${token}; Path=/; HttpOnly; SameSite=Strict`);
+    c.header("Set-Cookie", `session=${token}; ${COOKIE_FLAGS}`);
     return c.json({ id: Number(info.lastInsertRowid), username: username.trim(), is_admin: 0 }, 201);
   } catch (e) {
     if (e.message.includes("UNIQUE")) return c.json({ error: "Username already taken" }, 409);
@@ -161,7 +162,7 @@ app.post("/api/auth/login", async (c) => {
   }
   const token = crypto.randomBytes(32).toString("hex");
   db.prepare("INSERT INTO sessions (id, user_id) VALUES (?, ?)").run(token, user.id);
-  c.header("Set-Cookie", `session=${token}; Path=/; HttpOnly; SameSite=Strict`);
+  c.header("Set-Cookie", `session=${token}; ${COOKIE_FLAGS}`);
   return c.json({ id: user.id, username: user.username, is_admin: user.is_admin });
 });
 
@@ -169,7 +170,7 @@ app.post("/api/auth/logout", (c) => {
   const cookie = c.req.header("cookie") || "";
   const match = cookie.match(/session=([a-f0-9]+)/);
   if (match) db.prepare("DELETE FROM sessions WHERE id = ?").run(match[1]);
-  c.header("Set-Cookie", "session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0");
+  c.header("Set-Cookie", `session=; ${COOKIE_FLAGS}; Max-Age=0`);
   return c.json({ ok: true });
 });
 

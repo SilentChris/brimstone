@@ -53,6 +53,7 @@ function showApp() {
   document.getElementById("login-overlay").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
   document.getElementById("username-display").textContent = currentUser.username;
+  document.getElementById("user-panel-btn").textContent = currentUser.username[0].toUpperCase();
   // Show/hide admin-only elements
   document.querySelectorAll(".admin-only").forEach((el) => {
     el.style.display = currentUser.is_admin ? "" : "none";
@@ -101,7 +102,43 @@ document.getElementById("register-form").addEventListener("submit", async (e) =>
   }
 });
 
+// --- User panel toggle ---
+(function () {
+  const btn = document.getElementById("user-panel-btn");
+  const panel = document.getElementById("user-panel");
+  const backdrop = document.getElementById("user-panel-backdrop");
+
+  function openPanel() {
+    panel.classList.remove("hidden");
+    panel.classList.add("open");
+    backdrop.classList.remove("hidden");
+  }
+  function closePanel() {
+    panel.classList.add("hidden");
+    panel.classList.remove("open");
+    backdrop.classList.add("hidden");
+  }
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    panel.classList.contains("hidden") ? openPanel() : closePanel();
+  });
+  backdrop.addEventListener("click", closePanel);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePanel(); });
+  // Close on desktop click-outside
+  document.addEventListener("click", (e) => {
+    if (!panel.contains(e.target) && e.target !== btn) closePanel();
+  });
+})();
+
+function closeUserPanel() {
+  document.getElementById("user-panel").classList.add("hidden");
+  document.getElementById("user-panel").classList.remove("open");
+  document.getElementById("user-panel-backdrop").classList.add("hidden");
+}
+
 document.getElementById("change-pw-btn").addEventListener("click", async () => {
+  closeUserPanel();
   const current_password = prompt("Current password:");
   if (!current_password) return;
   const new_password = prompt("New password (4+ characters):");
@@ -111,6 +148,7 @@ document.getElementById("change-pw-btn").addEventListener("click", async () => {
 });
 
 document.getElementById("logout-btn").addEventListener("click", async () => {
+  closeUserPanel();
   await fetch(API + "/api/auth/logout", { method: "POST" });
   showLogin();
 });

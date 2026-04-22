@@ -51,13 +51,38 @@ header h1 { color: #c9a227; font-size: 1.6rem; }
 .login-tab.active { color: #c9a227; border-bottom-color: #c9a227; }
 .form-error { color: #e74c3c; font-size: 0.85rem; text-align: left; }
 
+/* Header user button */
+header { position: relative; }
+.user-panel-btn {
+  position: absolute; top: 1rem; right: 0;
+  background: #16213e; border: 1px solid #444; border-radius: 50%;
+  width: 2rem; height: 2rem; cursor: pointer; color: #c9a227;
+  font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.user-panel-btn:hover { background: #1e2f50; }
+
+/* User panel — desktop: dropdown popup anchored near the avatar button */
+.user-panel {
+  position: fixed; top: 4rem; right: max(1rem, calc(50% - 340px));
+  background: #16213e; border: 1px solid #444; border-radius: 8px;
+  padding: 1rem 1.25rem; z-index: 150; min-width: 180px;
+  display: flex; flex-direction: column; gap: 0.6rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.user-panel-name {
+  color: #c9a227; font-weight: 600; font-size: 0.95rem;
+  padding-bottom: 0.5rem; border-bottom: 1px solid #333;
+}
+.user-panel-backdrop { display: none; }
+
 /* User / Campaign bar */
 #user-bar {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center;
   gap: 0.5rem; padding: 0.5rem 0.75rem; background: #0f1a30;
   border-radius: 6px; margin-bottom: 0.5rem; flex-wrap: wrap;
 }
-.campaign-controls, .user-controls {
+.campaign-controls {
   display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
 }
 .campaign-controls label { color: #888; font-size: 0.8rem; white-space: nowrap; }
@@ -72,7 +97,6 @@ header h1 { color: #c9a227; font-size: 1.6rem; }
 .btn-small:hover { background: #444; }
 .btn-danger-small { color: #e74c3c; }
 .btn-danger-small:hover { background: rgba(231,76,60,0.15); }
-#username-display { color: #c9a227; font-size: 0.8rem; font-weight: 600; }
 
 /* Tabs */
 nav { display: flex; gap: 0.25rem; margin: 1rem 0; border-bottom: 2px solid #333; overflow-x: auto; overflow-y: hidden; }
@@ -292,13 +316,20 @@ button.big-btn { width: 100%; padding: 0.75rem; font-size: 1rem; margin: 1rem 0;
 
   header h1 { font-size: 1.3rem; }
 
-  #user-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.35rem;
+  /* User panel becomes a slide-in drawer from the right */
+  .user-panel-backdrop {
+    display: block; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 140;
   }
+  .user-panel-backdrop.hidden { display: none !important; }
 
-  .user-controls { justify-content: flex-end; }
+  .user-panel {
+    position: fixed; top: 0; right: -260px; bottom: 0;
+    width: 240px; border-radius: 0; border: none; border-left: 1px solid #444;
+    padding: 1.5rem 1.25rem; z-index: 150;
+    transition: right 0.25s ease;
+  }
+  .user-panel.open { right: 0; }
 
   #campaign-select { max-width: none; flex: 1; }
 
