@@ -51,11 +51,15 @@
     <!-- Campaign bar -->
     <div id="user-bar">
       <div class="campaign-controls">
-        <label for="campaign-select">Campaign:</label>
-        <select id="campaign-select"></select>
-        <button id="new-campaign-btn" class="btn-small">+ New</button>
-        <button id="rename-campaign-btn" class="btn-small">Rename</button>
-        <button id="delete-campaign-btn" class="btn-small btn-danger-small">Delete</button>
+        <div class="campaign-select-row">
+          <label for="campaign-select">Campaign:</label>
+          <select id="campaign-select"></select>
+        </div>
+        <div class="campaign-actions">
+          <button id="new-campaign-btn" class="btn-small">+ New</button>
+          <button id="rename-campaign-btn" class="btn-small">Rename</button>
+          <button id="delete-campaign-btn" class="btn-small btn-danger-small">Delete</button>
+        </div>
       </div>
     </div>
 
@@ -70,7 +74,10 @@
     <section id="missions" class="tab-content active">
       <div class="missions-header">
         <h2>Mission List</h2>
-        <button id="edit-mode-btn" class="btn-small admin-only">Edit</button>
+        <div class="missions-header-actions">
+          <button id="toggle-all-sourcebooks-btn" class="btn-small" onclick="toggleAllSourcebooks()">Expand All</button>
+          <button id="edit-mode-btn" class="btn-small admin-only">Edit</button>
+        </div>
       </div>
       <form id="add-mission-form" class="mission-form admin-only">
         <div class="form-row">

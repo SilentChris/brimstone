@@ -83,12 +83,16 @@ header { position: relative; }
   border-radius: 6px; margin-bottom: 0.5rem; flex-wrap: wrap;
 }
 .campaign-controls {
-  display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; flex: 1;
 }
+.campaign-select-row {
+  display: flex; align-items: center; gap: 0.4rem; flex: 1; min-width: 0;
+}
+.campaign-actions { display: flex; gap: 0.4rem; align-items: center; }
 .campaign-controls label { color: #888; font-size: 0.8rem; white-space: nowrap; }
 #campaign-select {
   padding: 0.3rem 0.5rem; background: #16213e; border: 1px solid #333;
-  border-radius: 4px; color: #e0e0e0; font-size: 0.8rem; max-width: 160px; min-width: 0;
+  border-radius: 4px; color: #e0e0e0; font-size: 0.8rem; flex: 1; min-width: 0;
 }
 .btn-small {
   padding: 0.2rem 0.5rem; background: #333; color: #ccc; border: none;
@@ -308,7 +312,24 @@ button.big-btn { width: 100%; padding: 0.75rem; font-size: 1rem; margin: 1rem 0;
   margin-bottom: 1rem;
 }
 .missions-header h2 { margin-bottom: 0; }
+.missions-header-actions { display: flex; gap: 0.4rem; align-items: center; }
 #edit-mode-btn.active { background: #c9a227; color: #1a1a2e; }
+
+/* Collapsible sourcebook groups */
+.sourcebook-group { margin-bottom: 0.25rem; }
+.sourcebook-header {
+  cursor: pointer; user-select: none;
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-bottom: 0; padding: 0.3rem 0;
+}
+.sourcebook-header:hover { color: #ddb832; }
+.sourcebook-caret {
+  font-size: 0.55rem; color: #888;
+  display: inline-block; transition: transform 0.15s;
+}
+.sourcebook-header.expanded .sourcebook-caret { transform: rotate(90deg); }
+.sourcebook-count { color: #888; font-size: 0.8rem; font-weight: normal; }
+.sourcebook-missions { margin-bottom: 0.75rem; }
 
 /* ── Mobile ─────────────────────────────────────────── */
 @media (max-width: 480px) {
@@ -331,7 +352,9 @@ button.big-btn { width: 100%; padding: 0.75rem; font-size: 1rem; margin: 1rem 0;
   }
   .user-panel.open { right: 0; }
 
-  #campaign-select { max-width: none; flex: 1; }
+  .campaign-controls { flex-direction: column; align-items: stretch; }
+  .campaign-select-row { width: 100%; }
+  .campaign-actions { width: 100%; }
 
   .tab { padding: 0.6rem 0.6rem; font-size: 0.85rem; }
 

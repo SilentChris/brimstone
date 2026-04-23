@@ -11,6 +11,7 @@ let allEnemyTypes = [];
 let selectedEnemies = [];
 let editSelectedEnemies = [];
 let editMode = false;
+let expandedSourcebooks = new Set(JSON.parse(localStorage.getItem("expandedSourcebooks") || "[]"));
 
 // --- API helpers ---
 async function api(method, path, body) {
@@ -594,6 +595,7 @@ function renderMissions() {
     el.innerHTML = activeCampaignId
       ? '<p class="empty-state">All missions completed in this campaign!</p>'
       : (missions.length ? '<p class="empty-state">No incomplete missions.</p>' : '<p class="empty-state">No missions yet.</p>');
+    updateToggleAllBtn([]);
     return;
   }
 
@@ -603,12 +605,16 @@ function renderMissions() {
   }
 
   el.innerHTML = Object.entries(grouped)
-    .map(
-      ([source, items]) => `
-    <h3>${esc(source)}</h3>
-    ${items
-      .map(
-        (m) => `
+    .map(([source, items]) => {
+      const isExpanded = expandedSourcebooks.has(source);
+      return `
+    <div class="sourcebook-group">
+      <h3 class="sourcebook-header${isExpanded ? " expanded" : ""}" onclick="toggleSourcebook(${JSON.stringify(source)})">
+        <span class="sourcebook-caret">&#9654;</span>
+        ${esc(source)} <span class="sourcebook-count">(${items.length})</span>
+      </h3>
+      <div class="sourcebook-missions${isExpanded ? "" : " hidden"}">
+        ${items.map((m) => `
       <div class="item">
         <div class="title">
           ${missionLabel(m)}
@@ -620,11 +626,42 @@ function renderMissions() {
           <button class="btn-fail" onclick="completeMission(${m.id}, 'failure')" title="Mark failure">fail</button>
         ` : ""}
         ${isAdmin && editMode ? `<button class="btn-delete" onclick="deleteMission(${m.id})">remove</button>` : ""}
-      </div>`
-      )
-      .join("")}`
-    )
+      </div>`).join("")}
+      </div>
+    </div>`;
+    })
     .join("");
+
+  updateToggleAllBtn(Object.keys(grouped));
+}
+
+function updateToggleAllBtn(sourceKeys) {
+  const btn = document.getElementById("toggle-all-sourcebooks-btn");
+  if (!btn) return;
+  const allExpanded = sourceKeys.length > 0 && sourceKeys.every((s) => expandedSourcebooks.has(s));
+  btn.textContent = allExpanded ? "Collapse All" : "Expand All";
+}
+
+function toggleSourcebook(source) {
+  if (expandedSourcebooks.has(source)) {
+    expandedSourcebooks.delete(source);
+  } else {
+    expandedSourcebooks.add(source);
+  }
+  localStorage.setItem("expandedSourcebooks", JSON.stringify([...expandedSourcebooks]));
+  renderMissions();
+}
+
+function toggleAllSourcebooks() {
+  const allSources = [...new Set(missions.filter((m) => !m.completed).map((m) => m.sourcebook))];
+  const allExpanded = allSources.length > 0 && allSources.every((s) => expandedSourcebooks.has(s));
+  if (allExpanded) {
+    expandedSourcebooks.clear();
+  } else {
+    allSources.forEach((s) => expandedSourcebooks.add(s));
+  }
+  localStorage.setItem("expandedSourcebooks", JSON.stringify([...expandedSourcebooks]));
+  renderMissions();
 }
 
 function renderHistory() {
