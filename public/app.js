@@ -155,6 +155,11 @@ document.getElementById("logout-btn").addEventListener("click", async () => {
 });
 
 // --- Edit mode toggle ---
+document.getElementById("mission-list").addEventListener("click", (e) => {
+  const header = e.target.closest(".sourcebook-header");
+  if (header) toggleSourcebook(header.dataset.source);
+});
+
 document.getElementById("edit-mode-btn").addEventListener("click", () => {
   editMode = !editMode;
   const btn = document.getElementById("edit-mode-btn");
@@ -609,7 +614,7 @@ function renderMissions() {
       const isExpanded = expandedSourcebooks.has(source);
       return `
     <div class="sourcebook-group">
-      <h3 class="sourcebook-header${isExpanded ? " expanded" : ""}" onclick="toggleSourcebook(${JSON.stringify(source)})">
+      <h3 class="sourcebook-header${isExpanded ? " expanded" : ""}" data-source="${esc(source)}">
         <span class="sourcebook-caret">&#9654;</span>
         ${esc(source)} <span class="sourcebook-count">(${items.length})</span>
       </h3>
