@@ -18,13 +18,13 @@
         <button class="login-tab" id="register-tab-btn">Register</button>
       </div>
       <form id="login-form">
-        <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+        <input type="text" id="login-username" placeholder="Username" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
         <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
         <button type="submit">Log In</button>
         <p id="login-error" class="form-error hidden"></p>
       </form>
       <form id="register-form" class="hidden">
-        <input type="text" id="reg-username" placeholder="Username" required autocomplete="username">
+        <input type="text" id="reg-username" placeholder="Username" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
         <input type="password" id="reg-password" placeholder="Password (4+ chars)" required minlength="4" autocomplete="new-password">
         <button type="submit">Register</button>
         <p id="register-error" class="form-error hidden"></p>
@@ -109,6 +109,10 @@
     <section id="randomizer" class="tab-content">
       <h2>Random Mission</h2>
       <button id="pick-random" class="big-btn">Pick a Random Mission</button>
+      <label class="randomizer-option">
+        <input type="checkbox" id="lowest-per-sourcebook">
+        Always pick the lowest-numbered unplayed mission in the chosen sourcebook
+      </label>
       <div id="random-result" class="result-card hidden"></div>
       <div class="filter-group">
         <h3>Filter by tags <span class="filter-hint">(click to cycle: ignore / require / exclude)</span></h3>

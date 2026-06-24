@@ -6,6 +6,7 @@ const crypto = require("node:crypto");
 
 const db = new DatabaseSync(process.env.DB_PATH || "./brimstone.db");
 const COOKIE_FLAGS = `Path=/; HttpOnly; SameSite=Strict${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
+const SESSION_MAX_AGE = 30 * 24 * 60 * 60; // 30 days, in seconds
 
 // --- Schema ---
 db.exec(`
@@ -49,7 +50,8 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS sessions (
     id TEXT PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at TEXT NOT NULL DEFAULT (datetime('now', '+30 days'))
   );
   CREATE TABLE IF NOT EXISTS campaigns (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,6 +85,16 @@ if (mtCols.some((c) => c.name === "tag")) {
   console.log("Migrated mission_tags from text to tag_id references");
 }
 
+// --- Migration: add session expiry to existing databases ---
+const sessionCols = db.prepare("PRAGMA table_info(sessions)").all();
+if (!sessionCols.some((c) => c.name === "expires_at")) {
+  // SQLite can't add a NOT NULL column with a non-constant default, so add it
+  // nullable and backfill existing sessions to expire 30 days from now.
+  db.exec("ALTER TABLE sessions ADD COLUMN expires_at TEXT");
+  db.exec("UPDATE sessions SET expires_at = datetime('now', '+30 days') WHERE expires_at IS NULL");
+  console.log("Added expires_at to sessions table");
+}
+
 // --- Seed admin user ---
 const adminExists = db.prepare("SELECT id FROM users WHERE is_admin = 1").get();
 if (!adminExists) {
@@ -106,14 +118,35 @@ function verifyPassword(password, stored) {
   return crypto.timingSafeEqual(Buffer.from(test, "hex"), Buffer.from(hash, "hex"));
 }
 
+// Create a session and set the session cookie with a 30-day lifetime.
+function createSession(c, userId) {
+  const token = crypto.randomBytes(32).toString("hex");
+  db.prepare("INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', ?))")
+    .run(token, userId, `+${SESSION_MAX_AGE} seconds`);
+  c.header("Set-Cookie", `session=${token}; ${COOKIE_FLAGS}; Max-Age=${SESSION_MAX_AGE}`);
+  return token;
+}
+
 function getSession(c) {
   const cookie = c.req.header("cookie") || "";
   const match = cookie.match(/session=([a-f0-9]+)/);
   if (!match) return null;
-  return db.prepare(
-    `SELECT s.id, s.user_id, u.username, u.is_admin
+  const session = db.prepare(
+    `SELECT s.id, s.user_id, s.expires_at, u.username, u.is_admin
      FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id = ?`
-  ).get(match[1]) || null;
+  ).get(match[1]);
+  if (!session) return null;
+  // Reject and clean up sessions past their 30-day expiry.
+  if (db.prepare("SELECT datetime('now') > ? AS expired").get(session.expires_at).expired) {
+    db.prepare("DELETE FROM sessions WHERE id = ?").run(session.id);
+    return null;
+  }
+  // Sliding expiration: each authenticated use refreshes the 30-day window,
+  // both server-side and in the browser cookie.
+  db.prepare("UPDATE sessions SET expires_at = datetime('now', ?) WHERE id = ?")
+    .run(`+${SESSION_MAX_AGE} seconds`, session.id);
+  c.header("Set-Cookie", `session=${session.id}; ${COOKIE_FLAGS}; Max-Age=${SESSION_MAX_AGE}`);
+  return session;
 }
 
 function requireAdmin(c) {
@@ -143,9 +176,7 @@ app.post("/api/auth/register", async (c) => {
   try {
     const info = db.prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)")
       .run(username.trim(), hashPassword(password));
-    const token = crypto.randomBytes(32).toString("hex");
-    db.prepare("INSERT INTO sessions (id, user_id) VALUES (?, ?)").run(token, Number(info.lastInsertRowid));
-    c.header("Set-Cookie", `session=${token}; ${COOKIE_FLAGS}`);
+    createSession(c, Number(info.lastInsertRowid));
     return c.json({ id: Number(info.lastInsertRowid), username: username.trim(), is_admin: 0 }, 201);
   } catch (e) {
     if (e.message.includes("UNIQUE")) return c.json({ error: "Username already taken" }, 409);
@@ -160,9 +191,7 @@ app.post("/api/auth/login", async (c) => {
   if (!user || !verifyPassword(password, user.password_hash)) {
     return c.json({ error: "Invalid username or password" }, 401);
   }
-  const token = crypto.randomBytes(32).toString("hex");
-  db.prepare("INSERT INTO sessions (id, user_id) VALUES (?, ?)").run(token, user.id);
-  c.header("Set-Cookie", `session=${token}; ${COOKIE_FLAGS}`);
+  createSession(c, user.id);
   return c.json({ id: user.id, username: user.username, is_admin: user.is_admin });
 });
 
@@ -600,38 +629,49 @@ app.post("/api/import", async (c) => {
 // --- Random mission selection ---
 
 app.post("/api/missions/random", async (c) => {
-  const { sourcebook_ids, mission_ids, include_tag_ids, exclude_tag_ids, campaign_id } = await c.req.json();
+  const { sourcebook_ids, mission_ids, include_tag_ids, exclude_tag_ids, campaign_id, lowest_per_sourcebook } = await c.req.json();
 
-  let sql = `SELECT m.id, m.title, m.mission_number, m.sourcebook_id, s.name as sourcebook
+  const select = `SELECT m.id, m.title, m.mission_number, m.sourcebook_id, s.name as sourcebook
              FROM missions m JOIN sourcebooks s ON m.sourcebook_id = s.id WHERE 1=1`;
+  let where = "";
   const params = [];
 
   if (campaign_id) {
-    sql += ` AND NOT EXISTS (SELECT 1 FROM campaign_completions cc WHERE cc.mission_id = m.id AND cc.campaign_id = ?)`;
+    where += ` AND NOT EXISTS (SELECT 1 FROM campaign_completions cc WHERE cc.mission_id = m.id AND cc.campaign_id = ?)`;
     params.push(campaign_id);
   }
 
   if (mission_ids && mission_ids.length > 0) {
-    sql += ` AND m.id IN (${mission_ids.map(() => "?").join(",")})`;
+    where += ` AND m.id IN (${mission_ids.map(() => "?").join(",")})`;
     params.push(...mission_ids);
   } else if (sourcebook_ids && sourcebook_ids.length > 0) {
-    sql += ` AND m.sourcebook_id IN (${sourcebook_ids.map(() => "?").join(",")})`;
+    where += ` AND m.sourcebook_id IN (${sourcebook_ids.map(() => "?").join(",")})`;
     params.push(...sourcebook_ids);
   }
 
   if (include_tag_ids && include_tag_ids.length > 0) {
-    sql += ` AND (SELECT COUNT(*) FROM mission_tags mt WHERE mt.mission_id = m.id AND mt.tag_id IN (${include_tag_ids.map(() => "?").join(",")})) = ?`;
+    where += ` AND (SELECT COUNT(*) FROM mission_tags mt WHERE mt.mission_id = m.id AND mt.tag_id IN (${include_tag_ids.map(() => "?").join(",")})) = ?`;
     params.push(...include_tag_ids, include_tag_ids.length);
   }
 
   if (exclude_tag_ids && exclude_tag_ids.length > 0) {
-    sql += ` AND NOT EXISTS (SELECT 1 FROM mission_tags mt WHERE mt.mission_id = m.id AND mt.tag_id IN (${exclude_tag_ids.map(() => "?").join(",")}))`;
+    where += ` AND NOT EXISTS (SELECT 1 FROM mission_tags mt WHERE mt.mission_id = m.id AND mt.tag_id IN (${exclude_tag_ids.map(() => "?").join(",")}))`;
     params.push(...exclude_tag_ids);
   }
 
-  sql += " ORDER BY RANDOM() LIMIT 1";
-  const row = db.prepare(sql).get(...params);
+  // Random pick — weights sourcebooks by their number of eligible missions.
+  let row = db.prepare(select + where + " ORDER BY RANDOM() LIMIT 1").get(...params);
   if (!row) return c.json({ error: "No matching incomplete missions" }, 404);
+
+  // Keep the weighted sourcebook, but switch to its lowest-numbered eligible
+  // mission so sourcebooks are always played in order. Unnumbered missions sort last.
+  if (lowest_per_sourcebook) {
+    const lowest = db.prepare(
+      select + where + " AND m.sourcebook_id = ? ORDER BY m.mission_number IS NULL, m.mission_number ASC LIMIT 1"
+    ).get(...params, row.sourcebook_id);
+    if (lowest) row = lowest;
+  }
+
   return c.json(hydrateMissions([row])[0]);
 });
 

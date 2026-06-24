@@ -861,6 +861,7 @@ document.getElementById("pick-random").addEventListener("click", async () => {
     sourcebook_ids: checked,
     include_tag_ids,
     exclude_tag_ids,
+    lowest_per_sourcebook: document.getElementById("lowest-per-sourcebook").checked,
   };
   if (activeCampaignId) body.campaign_id = activeCampaignId;
 
